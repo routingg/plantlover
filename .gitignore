@@ -1,1 +1,22 @@
 ExGR/
+
+
+# Python 가상환경
+venv/
+.venv/
+
+# __pycache__ 캐시 폴더
+__pycache__/
+
+# pyc 파일
+*.pyc
+
+# VSCode 설정 (선택)
+.vscode/
+
+# OS 임시 파일 (macOS, Windows)
+.DS_Store
+Thumbs.db
+
+# 환경변수 파일
+.env

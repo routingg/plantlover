@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>식집사들 - 스마트팜</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 20px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.2);
+        }
+
+        h1 {
+            color: #2e7d32;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .logo {
+            font-size: 1.2em;
+        }
+
+        .subtitle {
+            color: #66bb6a;
+            font-size: 1.1em;
+            font-weight: 300;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.15);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 3px solid transparent;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.3);
+            border-color: #81c784;
+        }
+
+        .card-icon {
+            font-size: 3.5em;
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            color: #2e7d32;
+            font-size: 1.4em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .card-description {
+            color: #66bb6a;
+            font-size: 0.95em;
+        }
+
+        .temperature {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+        }
+
+        .humidity {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        }
+
+        .growth {
+            background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+        }
+
+        .watering {
+            background: linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 100%);
+        }
+
+        .current-plant {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        }
+
+        .status-bar {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.15);
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-icon {
+            font-size: 1.5em;
+        }
+
+        .status-text {
+            color: #2e7d32;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .status-bar {
+                flex-direction: column;
+            }
+        }
+
+        /* 버튼 클릭 효과 */
+        .card:active {
+            transform: translateY(-2px);
+        }
+
+        /* 장식 요소 */
+        .plant-decoration {
+            position: fixed;
+            opacity: 0.1;
+            pointer-events: none;
+            font-size: 8em;
+            color: #4caf50;
+        }
+
+        .plant-decoration-1 {
+            top: 10%;
+            left: 5%;
+            transform: rotate(-15deg);
+        }
+
+        .plant-decoration-2 {
+            bottom: 10%;
+            right: 5%;
+            transform: rotate(15deg);
+        }
+    </style>
+</head>
+<body>
+    <div class="plant-decoration plant-decoration-1">🌿</div>
+    <div class="plant-decoration plant-decoration-2">🌱</div>
+
+    <div class="container">
+        <header>
+            <h1>
+                <span class="logo">🌱</span>
+                식집사들
+                <span class="logo">🌿</span>
+            </h1>
+            <p class="subtitle">우리 식물을 위한 스마트한 관리</p>
+        </header>
+
+        <div class="dashboard">
+            <div class="card temperature" onclick="location.href='{% url "temperature" %}'">
+                <div class="card-icon">🌡️</div>
+                <h2 class="card-title">온도</h2>
+                <p class="card-description">현재 온도 확인하기</p>
+            </div>
+
+            <div class="card humidity" onclick="location.href='{% url "humidity" %}'">
+                <div class="card-icon">💧</div>
+                <h2 class="card-title">습도</h2>
+                <p class="card-description">습도 수치 보기</p>
+            </div>
+
+            <div class="card growth" onclick="location.href='{% url "growth" %}'">
+                <div class="card-icon">📈</div>
+                <h2 class="card-title">생장</h2>
+                <p class="card-description">식물 성장 기록</p>
+            </div>
+
+            <div class="card watering" onclick="location.href='{% url "watering" %}'">
+                <div class="card-icon">🚿</div>
+                <h2 class="card-title">물주기</h2>
+                <p class="card-description">물주기 관리</p>
+            </div>
+
+            <div class="card current-plant" onclick="location.href='{% url "current_plant" %}'">
+                <div class="card-icon">🪴</div>
+                <h2 class="card-title">현재식물보기</h2>
+                <p class="card-description">우리 식물 상태</p>
+            </div>
+        </div>
+
+        <div class="status-bar">
+            <div class="status-item">
+                <span class="status-icon">✅</span>
+                <span class="status-text">시스템 정상</span>
+            </div>
+            <div class="status-item">
+                <span class="status-icon">🌱</span>
+                <span class="status-text">식물 건강</span>
+            </div>
+            <div class="status-item">
+                <span class="status-icon">📡</span>
+                <span class="status-text">센서 연결됨</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Django에서 URL이 없을 경우를 대비한 기본 동작
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                // URL이 설정되지 않은 경우 알림 표시
+                if (this.onclick.toString().includes('undefined')) {
+                    e.preventDefault();
+                    alert('해당 페이지는 준비 중입니다.');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
