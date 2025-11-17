@@ -46,7 +46,7 @@ def calc_ndvi(image):
     bottom = (r.astype(float) + b.astype(float))
     bottom[bottom==0] = 0.01
     ndvi = (b.astype(float) - r) / bottom
-    #ndvi = (r.astype(float) - b) / bottom #ndvi 카메라 사용시 이것으로 바꿀것
+    #ndvi = (r.astype(float) - b) / bottom #noir 카메라 사용시 이것으로 바꿀것
 
     return ndvi
 
