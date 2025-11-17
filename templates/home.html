@@ -54,7 +54,7 @@
 
         .dashboard {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 25px;
             margin-bottom: 30px;
         }
@@ -62,7 +62,7 @@
         .card {
             background: white;
             border-radius: 20px;
-            padding: 30px;
+            padding: 40px 30px;
             text-align: center;
             box-shadow: 0 4px 15px rgba(76, 175, 80, 0.15);
             transition: all 0.3s ease;
@@ -77,40 +77,33 @@
         }
 
         .card-icon {
-            font-size: 3.5em;
-            margin-bottom: 15px;
+            font-size: 4em;
+            margin-bottom: 20px;
         }
 
         .card-title {
             color: #2e7d32;
-            font-size: 1.4em;
+            font-size: 1.6em;
             font-weight: 600;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
 
         .card-description {
             color: #66bb6a;
-            font-size: 0.95em;
-        }
-
-        .temperature {
-            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
-        }
-
-        .humidity {
-            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-        }
-
-        .growth {
-            background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
-        }
-
-        .watering {
-            background: linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 100%);
+            font-size: 1em;
+            line-height: 1.5;
         }
 
         .current-plant {
             background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        }
+
+        .plant-report {
+            background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+        }
+
+        .tips {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
         }
 
         .status-bar {
@@ -196,34 +189,22 @@
         </header>
 
         <div class="dashboard">
-            <div class="card temperature" onclick="location.href='{% url "temperature" %}'">
-                <div class="card-icon">🌡️</div>
-                <h2 class="card-title">온도</h2>
-                <p class="card-description">현재 온도 확인하기</p>
-            </div>
-
-            <div class="card humidity" onclick="location.href='{% url "humidity" %}'">
-                <div class="card-icon">💧</div>
-                <h2 class="card-title">습도</h2>
-                <p class="card-description">습도 수치 보기</p>
-            </div>
-
-            <div class="card growth" onclick="location.href='{% url "growth" %}'">
-                <div class="card-icon">📈</div>
-                <h2 class="card-title">생장</h2>
-                <p class="card-description">식물 성장 기록</p>
-            </div>
-
-            <div class="card watering" onclick="location.href='{% url "watering" %}'">
-                <div class="card-icon">🚿</div>
-                <h2 class="card-title">물주기</h2>
-                <p class="card-description">물주기 관리</p>
-            </div>
-
             <div class="card current-plant" onclick="location.href='{% url "current_plant" %}'">
                 <div class="card-icon">🪴</div>
-                <h2 class="card-title">현재식물보기</h2>
-                <p class="card-description">우리 식물 상태</p>
+                <h2 class="card-title">현재 식물보기</h2>
+                <p class="card-description">우리 식물의 현재 상태와<br>실시간 환경 정보를 확인하세요</p>
+            </div>
+
+            <div class="card plant-report" onclick="location.href='{% url "plant_report" %}'">
+                <div class="card-icon">📊</div>
+                <h2 class="card-title">식물 리포트</h2>
+                <p class="card-description">성장 기록과 데이터 분석을 통해<br>식물의 건강 상태를 점검하세요</p>
+            </div>
+
+            <div class="card tips" onclick="location.href='{% url "tips" %}'">
+                <div class="card-icon">💡</div>
+                <h2 class="card-title">팁</h2>
+                <p class="card-description">식물 관리 팁과<br>유용한 정보를 확인하세요</p>
             </div>
         </div>
 

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>현재 식물 상태</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 25px 20px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.2);
+        }
+
+        h1 {
+            color: #2e7d32;
+            font-size: 2em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .main-area {
+            display: flex;
+            gap: 25px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .camera-box {
+            width: 600px;
+            height: 400px;
+            background-color: black;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.25);
+        }
+
+        .camera-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .button-area {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .control-btn {
+            width: 200px;
+            padding: 18px 0;
+            border-radius: 18px;
+            font-size: 1.2em;
+            text-align: center;
+            cursor: pointer;
+            border: 3px solid transparent;
+            background: white;
+            color: #2e7d32;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.2);
+        }
+
+        .control-btn:hover {
+            transform: translateY(-4px);
+            background: #a5d6a7;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <header>
+        <h1>🌿 현재 식물 상태</h1>
+    </header>
+
+    <div class="main-area">
+
+        <div class="camera-box">
+            <img src="{% url 'video_feed' %}" alt="실시간 카메라 화면">
+        </div>
+
+        <div class="button-area">
+            <button class="control-btn" onclick="sendCommand('water')">💧 물주기</button>
+            <button class="control-btn" onclick="sendCommand('light')">💡 식물등 켜기</button>
+        </div>
+
+    </div>
+</div>
+
+<script>
+function sendCommand(cmd) {
+    fetch(`/control/${cmd}/`)
+        .then(r => alert(cmd + " 실행됨"))
+        .catch(e => alert("에러"))
+}
+</script>
+
+</body>
+</html>
