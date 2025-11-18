@@ -48,8 +48,10 @@ def calc_ndvi(image):
     bottom = (r.astype(float) + b.astype(float))
     bottom[bottom==0] = 0.01
     ndvi = (b.astype(float) - r) / bottom
-    return ndvi
+    #ndvi = (r.astype(float) - b) / bottom Noir 카메라 사용시
 
+    return ndvi
+#csv파일 생성/기록
 if not os.path.exists(CSV_FILENAME):
     with open(CSV_FILENAME, 'w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
@@ -75,6 +77,7 @@ try:
         color_mapped_prep = ndvi_contrasted.astype(np.uint8)
         color_mapped_image = cv2.applyColorMap(color_mapped_prep, fastiecm)
 
+        #실시간 그래프
         normalized_data = color_mapped_prep / 255.0
         curr_avg = np.mean(normalized_data)
         curr_mid = np.median(normalized_data)
@@ -102,6 +105,7 @@ try:
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
+#종료후 그래프 생성
 finally:
     cap.release()
     cv2.destroyAllWindows()
