@@ -7,12 +7,21 @@ import time
 import os
 import csv
 
-CAPTURE_INTERVAL = 30
+CAPTURE_INTERVAL = 30  # 데이터 기록 간격 (초 단위)
 CSV_FILENAME = "ndvi_log.csv"
-GRAPH_FILENAME = "final_result_graph.png"
+SAVE_FOLDER = "ndvi_graph" 
+
+if not os.path.exists(CSV_FILENAME):
+    with open(CSV_FILENAME, 'w', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        writer.writerow(['Time', 'Average', 'Median'])
+
+if not os.path.exists(SAVE_FOLDER):
+    os.makedirs(SAVE_FOLDER) 
 
 cap = cv2.VideoCapture(0)
 
+#실시간 화면
 plt.ion()
 fig, ax = plt.subplots()
 max_len = 100
@@ -26,9 +35,10 @@ line_mid, = ax.plot(x_data, y_mid, color='blue', label='Median', linewidth=2)
 ax.set_ylim(0, 1.05)
 ax.set_xlim(0, max_len - 1)
 ax.set_ylabel("NDVI Value")
-ax.set_title("Live")
+ax.set_title("Live Monitor")
 ax.legend(loc='upper left')
 ax.grid(True, linestyle='--', alpha=0.5)
+
 
 def contrast_stretch(im):
     im = im.astype(float)
@@ -48,16 +58,56 @@ def calc_ndvi(image):
     bottom = (r.astype(float) + b.astype(float))
     bottom[bottom==0] = 0.01
     ndvi = (b.astype(float) - r) / bottom
-    #ndvi = (r.astype(float) - b) / bottom Noir 카메라 사용시
-
     return ndvi
-#csv파일 생성/기록
-if not os.path.exists(CSV_FILENAME):
-    with open(CSV_FILENAME, 'w', newline='', encoding='utf-8') as f:
-        writer = csv.writer(f)
-        writer.writerow(['Time', 'Average', 'Median'])
+
+def save_summary_graph_from_csv(csv_path, graph_path, current_timestamp):
+    times = []
+    avgs = []
+    mids = []
+
+    try:
+        with open(csv_path, 'r', encoding='utf-8') as f:
+            reader = csv.reader(f)
+            next(reader)
+            
+            for row in reader:
+                if not row: continue
+                times.append(row[0])
+                avgs.append(float(row[1]))
+                mids.append(float(row[2]))
+
+        if len(times) > 0:
+            # 저장을 위한 새로운 figure 생성
+            plt.figure(figsize=(10, 6)) 
+            plt.plot(times, avgs, marker='o', color='red', label='Average (Mean)', linewidth=2)
+            plt.plot(times, mids, marker='s', color='blue', label='Median', linestyle='--', linewidth=2)
+
+            plt.title(f"NDVI Analysis Log - Snapshot {current_timestamp}", fontsize=16)
+            plt.xlabel("Time", fontsize=12)
+            plt.ylabel("NDVI Value (0.0 ~ 1.0)", fontsize=12)
+            plt.ylim(0, 1.1)
+            plt.legend()
+            plt.grid(True, alpha=0.5)
+            
+            if len(times) > 20:
+                step = len(times) // 20
+                plt.xticks(range(0, len(times), step), times[::step], rotation=45)
+            else:
+                plt.xticks(rotation=45)
+
+            plt.tight_layout()
+            plt.savefig(graph_path)
+            plt.close() 
+            return True
+        else:
+            return False
+
+    except Exception as e:
+        print(f"Error creating periodic graph: {e}")
+        return False
 
 last_capture_time = time.time()
+print(f"시스템 시작. 데이터 로깅 및 그래프 저장 {CAPTURE_INTERVAL}초 간격.")
 
 try:
     while True:
@@ -77,7 +127,6 @@ try:
         color_mapped_prep = ndvi_contrasted.astype(np.uint8)
         color_mapped_image = cv2.applyColorMap(color_mapped_prep, fastiecm)
 
-        #실시간 그래프
         normalized_data = color_mapped_prep / 255.0
         curr_avg = np.mean(normalized_data)
         curr_mid = np.median(normalized_data)
@@ -90,14 +139,22 @@ try:
         fig.canvas.flush_events()
 
         current_time = time.time()
+        
+        # Check Logging/Saving Interval
         if current_time - last_capture_time >= CAPTURE_INTERVAL:
             time_str = time.strftime("%H:%M:%S")
+            file_timestamp = time.strftime("%Y%m%d_%H%M%S")
             
+            #CSV에 데이터 기록
             with open(CSV_FILENAME, 'a', newline='', encoding='utf-8') as f:
                 writer = csv.writer(f)
                 writer.writerow([time_str, curr_avg, curr_mid])
             
-            print(f"[Saved] {time_str} - Avg: {curr_avg:.4f}, Med: {curr_mid:.4f}")
+            #CSV 데이터를 읽어와 누적 그래프 저장
+            graph_output_path = os.path.join(SAVE_FOLDER, f"trend_{file_timestamp}.png")
+            if save_summary_graph_from_csv(CSV_FILENAME, graph_output_path, time_str):
+                 print(f"[LOG & GRAPH SAVED] {time_str}. File: {graph_output_path}")
+            
             last_capture_time = current_time
 
         cv2.imshow('NDVI', color_mapped_image)
@@ -105,52 +162,7 @@ try:
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
-#종료후 그래프 생성
 finally:
     cap.release()
     cv2.destroyAllWindows()
-    plt.close('all') 
-
-    if os.path.exists(CSV_FILENAME):
-        times = []
-        avgs = []
-        mids = []
-        
-        try:
-            with open(CSV_FILENAME, 'r', encoding='utf-8') as f:
-                reader = csv.reader(f)
-                header = next(reader)
-                
-                for row in reader:
-                    if not row: continue
-                    times.append(row[0])
-                    avgs.append(float(row[1]))
-                    mids.append(float(row[2]))
-
-            if len(times) > 0:
-                plt.figure(figsize=(10, 6)) 
-                plt.plot(times, avgs, marker='o', color='red', label='Average (Mean)', linewidth=2)
-                plt.plot(times, mids, marker='s', color='blue', label='Median', linestyle='--', linewidth=2)
-
-                plt.title("NDVI Analysis Log", fontsize=16)
-                plt.xlabel("Time", fontsize=12)
-                plt.ylabel("NDVI Value", fontsize=12)
-                plt.ylim(0, 1.1)
-                plt.legend()
-                plt.grid(True, alpha=0.5)
-                
-                if len(times) > 20:
-                    step = len(times) // 20
-                    plt.xticks(range(0, len(times), step), times[::step], rotation=45)
-                else:
-                    plt.xticks(rotation=45)
-
-                plt.tight_layout()
-                plt.savefig(GRAPH_FILENAME)
-                print(f"Graph saved: {GRAPH_FILENAME}")
-                plt.show()
-            else:
-                print("No data found in CSV.")
-
-        except Exception as e:
-            print(f"Error creating graph: {e}")
+    plt.close('all')
