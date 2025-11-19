@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -71,8 +73,10 @@
         <h2>🌿 로즈마리 기본 정보</h2>
 
         <!-- 무료 이미지 예시 (Unsplash) -->
-        <img src="https://m.yummygarden.co.kr/web/product/big/202304/325bfd4cf1edf0a4b6825849a6b0d9c9.jpg"
-             class="tip-img" alt="로즈마리 이미지">
+        <!-- <img src="https://m.yummygarden.co.kr/web/product/big/202304/325bfd4cf1edf0a4b6825849a6b0d9c9.jpg"
+             class="tip-img" alt="로즈마리 이미지"> -->
+        <img src="{% static 'image/rosemary.jpg' %}" alt="tip-img2" class="로즈마리 이미지2" style="width: 40%; display: block; margin: 0 auto; border-radius: 12px;">
+
 
         <p>로즈마리는 상록 관목으로 향기가 강하며 허브로 널리 사용됩니다. 비교적 건조한 환경을 좋아하며, 햇빛을 충분히 받을수록 향이 더 강해집니다.</p>
 

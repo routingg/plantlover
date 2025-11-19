@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -48,6 +49,23 @@
             font-size: 1.05em;
             color: #4a148c;
         }
+
+        /* NDVI 이미지 전용 스타일 */
+        .ndvi-img {
+            width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+            border-radius: 12px;
+            margin-top: 15px;
+            box-shadow: 0 4px 10px rgba(156, 39, 176, 0.25);
+        }
+
+        .ndvi-note {
+            margin-top: 10px;
+            font-size: 0.95em;
+            color: #6a1b9a;
+            line-height: 1.5;
+        }
     </style>
 </head>
 
@@ -58,26 +76,45 @@
         <p>최근 센서 데이터와 성장 상태 분석</p>
     </header>
 
+    <!-- 기존 생육 데이터 카드 -->
     <div class="report-card">
         <h2>🌱 생육 데이터</h2>
-        <p class="data-item">토양 습도: 45%</p>
-        <p class="data-item">조도(Lux): 320</p>
-        <p class="data-item">온도: 23.5°C</p>
-        <p class="data-item">습도: 58%</p>
+        <p class="data-item">토양 습도: {{ soil_moisture|default:"45%" }}</p>
+        <p class="data-item">조도(Lux): {{ light_lux|default:"320" }}</p>
+        <p class="data-item">온도: {{ temperature|default:"23.5°C" }}</p>
+        <p class="data-item">습도: {{ humidity|default:"58%" }}</p>
     </div>
 
+    <!-- 기존 물 준 기록 카드 -->
     <div class="report-card">
         <h2>💧 물 준 기록</h2>
-        <p class="data-item">2025-11-17: 물주기 1회</p>
-        <p class="data-item">2025-11-14: 물주기 1회</p>
-        <p class="data-item">2025-11-10: 자동 급수</p>
+        <p class="data-item">최근 물주기: {{ last_watering_time|default:"2025-11-17 10:30" }}</p>
+        <p class="data-item">이번 주 총 급수 횟수: {{ watering_count_week|default:"3회" }}</p>
     </div>
 
+    <!-- 기존 성장 로그 카드 -->
     <div class="report-card">
         <h2>📈 성장 로그</h2>
-        <p class="data-item">2025-11-01: 새 잎 1개 성장</p>
-        <p class="data-item">2025-10-27: 잎 색 개선됨</p>
-        <p class="data-item">2025-10-21: 토양 건조도 감소</p>
+        <p class="data-item">{{ growth_log_1|default:"2025-11-01: 새 잎 1개 성장" }}</p>
+        <p class="data-item">{{ growth_log_2|default:"2025-10-27: 잎 색 개선됨" }}</p>
+        <p class="data-item">{{ growth_log_3|default:"2025-10-21: 토양 건조도 감소" }}</p>
+    </div>
+
+    <!-- ✅ NDVI 분석 카드 (ndvi.py 결과 활용) -->
+    <div class="report-card">
+        <h2>🌿 NDVI(식생지수) 분석</h2>
+        <p class="data-item">마지막 측정 시각: {{ ndvi_time|default:"최근 측정 없음" }}</p>
+        <p class="data-item">평균 NDVI: {{ ndvi_avg|default:"0.68" }}</p>
+        <p class="data-item">중앙값 NDVI: {{ ndvi_mid|default:"0.65" }}</p>
+
+        <!-- ndvi.py가 저장한 그래프 이미지 사용 -->
+        <img src="{% static 'image/final_result_graph.png' %}" alt="NDVI 분석 그래프" class="ndvi-img">
+
+        <p class="ndvi-note">
+            NDVI는 식물의 활력을 나타내는 지표로, 일반적으로
+            <b>0.6 이상이면 건강한 상태</b>로 볼 수 있습니다.<br>
+            시간이 지남에 따라 NDVI가 떨어지면 수분 부족, 광량 부족, 병해 등의 가능성을 의심해볼 수 있습니다.
+        </p>
     </div>
 
 </div>

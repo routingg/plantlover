@@ -8,8 +8,7 @@ def home(request):
 def current_plant(request):
     return render(request, "current_plant.html")
 
-def plant_report(request):
-    return render(request, "plant_report.html", {"title": "식물리포트", "desc": "우리 식물 리포트"})
+
 
 def tips(request):
     return render(request, "tips.html", {"title": "식물관리팁", "desc": "식물관리 꿀팁"})
@@ -48,3 +47,46 @@ def video_feed(request):
 def control(request, cmd):
     print("식물 명령:", cmd)
     return HttpResponse(f"{cmd} OK")
+
+
+import csv
+import os
+from django.shortcuts import render
+
+CSV_FILENAME = "ndvi_log.csv"   # ndvi.py와 같은 위치에 있다고 가정
+
+def plant_report(request):
+    ndvi_time = None
+    ndvi_avg = None
+    ndvi_mid = None
+
+    if os.path.exists(CSV_FILENAME):
+        with open(CSV_FILENAME, "r", encoding="utf-8") as f:
+            reader = csv.reader(f)
+            header = next(reader, None)  # ['Time', 'Average', 'Median']
+            rows = [row for row in reader if row]
+
+        if rows:
+            last = rows[-1]
+            ndvi_time = last[0]
+            ndvi_avg = float(last[1])
+            ndvi_mid = float(last[2])
+
+    context = {
+        "soil_moisture": "45%",
+        "light_lux": "320",
+        "temperature": "23.5°C",
+        "humidity": "58%",
+        "last_watering_time": "2025-11-17 10:30",
+        "watering_count_week": "3회",
+        "growth_log_1": "2025-11-01: 새 잎 1개 성장",
+        "growth_log_2": "2025-10-27: 잎 색 개선됨",
+        "growth_log_3": "2025-10-21: 토양 건조도 감소",
+
+        # NDVI 값
+        "ndvi_time": ndvi_time,
+        "ndvi_avg": f"{ndvi_avg:.3f}" if ndvi_avg is not None else None,
+        "ndvi_mid": f"{ndvi_mid:.3f}" if ndvi_mid is not None else None,
+    }
+
+    return render(request, "plant_report.html", context)
