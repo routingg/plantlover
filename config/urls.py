@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from smartfarm.views import control, home, video_feed
-from smartfarm.views import current_plant, plant_report, tips
+from smartfarm.views import current_plant, plant_report, tips, plant_counseling
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -27,11 +27,11 @@ urlpatterns = [
     path('current_plant/', current_plant, name='current_plant'),
     path('plant_report/', plant_report, name='plant_report'),
     path('tips/', tips, name='tips'),
+    path('plant_counseling/', plant_counseling, name='plant_counseling'),
 
     # 카메라 스트림
     path("video_feed/", video_feed, name="video_feed"),
 
     # 제어 버튼
     path("control/<str:cmd>/", control, name="control"),
-
 ]

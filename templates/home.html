@@ -54,7 +54,8 @@
 
         .dashboard {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            /* 2 x 2 고정 레이아웃 (데스크탑 기준) */
+            grid-template-columns: repeat(2, minmax(250px, 1fr));
             gap: 25px;
             margin-bottom: 30px;
         }
@@ -105,6 +106,10 @@
         .tips {
             background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
         }
+
+        .counseling {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        }      
 
         .status-bar {
             background: white;
@@ -199,6 +204,12 @@
                 <div class="card-icon">📊</div>
                 <h2 class="card-title">식물 리포트</h2>
                 <p class="card-description">성장 기록과 데이터 분석을 통해<br>식물의 건강 상태를 점검하세요</p>
+            </div>
+
+            <div class="card counseling" onclick="location.href='{% url "plant_counseling" %}'">
+                <div class="card-icon">🛟</div>
+                <h2 class="card-title">식물 상담소</h2>
+                <p class="card-description">노랗게 변한 잎, 과습·건조 고민 등<br>식물 고민을 상담해 보세요</p>
             </div>
 
             <div class="card tips" onclick="location.href='{% url "tips" %}'">

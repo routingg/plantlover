@@ -1,0 +1,246 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>식물 상담소 챗봇</title>
+    <style>
+        /* 기본 리셋 & 공통 설정 */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        /* 메인 컨테이너 */
+        .chat-container {
+            width: 100%;
+            max-width: 820px;
+            height: 80vh;
+            max-height: 760px;
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.25);
+            padding: 20px 22px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 헤더 영역 */
+        .chat-header {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .chat-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #1565c0;
+            margin: 0 0 6px 0;
+        }
+        .chat-subtitle {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #5c6bc0;
+        }
+
+        /* 채팅 창 영역 */
+        .chat-window {
+            flex: 1;
+            margin-top: 14px;
+            border-radius: 16px;
+            border: 1px solid #bbdefb;
+            padding: 14px;
+            background-color: #f5f9ff;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .message-group {
+            display: flex;
+            flex-direction: column;
+            max-width: 80%;
+        }
+
+        .message-group--bot {
+            align-self: flex-start;
+        }
+
+        .message-group--user {
+            align-self: flex-end;
+            text-align: right;
+        }
+
+        .message-meta {
+            font-size: 0.78rem;
+            color: #90a4ae;
+            margin-bottom: 3px;
+        }
+
+        .message-bubble {
+            padding: 9px 13px;
+            border-radius: 16px;
+            font-size: 0.94rem;
+            line-height: 1.5;
+            word-wrap: break-word;
+            word-break: break-word;
+        }
+
+        .message-bubble--bot {
+            background-color: #e3f2fd;
+            color: #0d47a1;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-bubble--user {
+            background-color: #42a5f5;
+            color: #ffffff;
+            border-bottom-right-radius: 4px;
+        }
+
+        /* 입력 영역 */
+        .chat-form {
+            margin-top: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .plant-type {
+            font-size: 0.88rem;
+        }
+
+        .plant-type-input {
+            width: 100%;
+            margin-top: 4px;
+            padding: 8px 10px;
+            border-radius: 10px;
+            border: 1px solid #bbdefb;
+            font-size: 0.9rem;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 2px;
+        }
+
+        .input-textarea {
+            flex: 1;
+            resize: none;
+            border-radius: 12px;
+            border: 1px solid #90caf9;
+            padding: 10px;
+            font-size: 0.94rem;
+            height: 60px;
+        }
+
+        .input-submit {
+            width: 120px;
+            border: none;
+            border-radius: 12px;
+            background-color: #42a5f5;
+            color: #ffffff;
+            font-size: 0.94rem;
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+        }
+
+        .input-submit:hover {
+            background-color: #1e88e5;
+        }
+
+        /* 모바일 대응 */
+        @media (max-width: 600px) {
+            .chat-container {
+                height: 90vh;
+                padding: 16px;
+            }
+            .chat-title {
+                font-size: 1.2rem;
+            }
+            .message-group {
+                max-width: 90%;
+            }
+            .input-submit {
+                width: 90px;
+                font-size: 0.88rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="chat-container">
+    <header class="chat-header">
+        <h1 class="chat-title">🌿 식물 상담소 챗봇</h1>
+        <p class="chat-subtitle">
+            키우는 식물과 고민을 말해주면, 기본적인 관리 팁을 알려줄게요.
+        </p>
+    </header>
+
+    <section class="chat-window" id="chat-window">
+        {% if messages %}
+            {% for msg in messages %}
+                <div class="message-group message-group--{{ msg.sender }}">
+                    <div class="message-meta">
+                        {{ msg.sender|upper }} · {{ msg.time }}
+                    </div>
+                    <div class="message-bubble message-bubble--{{ msg.sender }}">
+                        {{ msg.text }}
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="message-group message-group--bot">
+                <div class="message-bubble message-bubble--bot">
+                    안녕하세요! 어떤 식물을 키우고 있나요?<br>
+                    잎 색 변화, 물 주는 주기, 햇빛/온도 고민을 자유롭게 물어보세요.
+                </div>
+            </div>
+        {% endif %}
+    </section>
+
+    <form method="post" class="chat-form">
+        {% csrf_token %}
+        <div class="plant-type">
+            <label for="plant_type">키우는 식물</label>
+            <input id="plant_type"
+                   type="text"
+                   name="plant_type"
+                   class="plant-type-input"
+                   placeholder="예: 로즈마리, 몬스테라, 스킨답서스"
+                   value="{{ plant_type|default:'' }}">
+        </div>
+
+        <div class="input-row">
+            <textarea name="user_message"
+                      class="input-textarea"
+                      placeholder="식물 상태나 고민을 입력해 주세요. 예: 잎 끝이 갈색이고 흙이 항상 축축해요."></textarea>
+            <button type="submit" class="input-submit">보내기</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    // 페이지 로드 시 채팅창을 맨 아래로 스크롤
+    (function () {
+        const chatWindow = document.getElementById('chat-window');
+        if (chatWindow) {
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+    })();
+</script>
+</body>
+</html>
