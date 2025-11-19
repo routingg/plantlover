@@ -39,18 +39,17 @@ ax.set_title("Live Monitor")
 ax.legend(loc='upper left')
 ax.grid(True, linestyle='--', alpha=0.5)
 
-
 def contrast_stretch(im):
-    im = im.astype(float)
     in_min = np.percentile(im, 5)
     in_max = np.percentile(im, 95)
+
     out_min = 0.0
     out_max = 255.0
+
     out = im - in_min
-    if in_max - in_min != 0:
-        out *= ((out_min - out_max) / (in_min - in_max))
-    out += out_min
-    out = np.clip(out, 0, 255)
+    out *= ((out_min - out_max) / (in_min - in_max))
+    out += in_min
+
     return out
 
 def calc_ndvi(image):
@@ -58,6 +57,8 @@ def calc_ndvi(image):
     bottom = (r.astype(float) + b.astype(float))
     bottom[bottom==0] = 0.01
     ndvi = (b.astype(float) - r) / bottom
+    #ndvi = (r.astype(float) - b) / bottom Noir 카메라 사용시
+
     return ndvi
 
 def save_summary_graph_from_csv(csv_path, graph_path, current_timestamp):
