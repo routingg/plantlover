@@ -1,5 +1,12 @@
 # plantlover
-AI 실시간 병해 진단 (Disease Detection)
+
+## Requirements
+matplotlib==3.10.7
+numpy==2.3.5
+opencv_python==4.12.0.88
+ultralytics==8.3.230
+
+1. AI 실시간 병해 진단 (Disease Detection)
 
 YOLO 모델 기반 탐지: 학습된 가중치 파일(best.pt)을 사용하여 웹캠 영상 속 식물을 실시간으로 분석합니다.
 
