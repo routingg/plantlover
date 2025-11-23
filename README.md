@@ -2,8 +2,11 @@
 
 ## Requirements
 matplotlib==3.10.7
+
 numpy==2.3.5
+
 opencv_python==4.12.0.88
+
 ultralytics==8.3.230
 
 1. AI 실시간 병해 진단 (Disease Detection)
