@@ -25,3 +25,10 @@ YOLO 모델 기반 탐지: 학습된 가중치 파일(best.pt)을 사용하여 �
 컬러맵 적용: 육안으로 구분하기 힘든 식물의 활력도를 fastiecm 컬러맵을 통해 시각적으로 보여줍니다.
 
 관련 파일: ndvi.py, fastiecm.py
+
+### best.pt
+
+Class (클래스)	Images (이미지 수)	Instances (객체 수)	Precision (정확도)	Recall (재현율)	mAP50	mAP50-95
+all (전체 평균)	514	1753	0.753	0.692	0.771	0.527
+Disease (병해)	331	798	0.741	0.664	0.741	0.508
+Healthy (건강)	182	955	0.764	0.72	0.8	0.546
