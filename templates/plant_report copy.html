@@ -1,0 +1,195 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>식물 리포트</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 35px;
+            padding: 25px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(156, 39, 176, 0.2);
+        }
+
+        h1 {
+            color: #6a1b9a;
+        }
+
+        .report-card {
+            background: white;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-radius: 18px;
+            box-shadow: 0 4px 15px rgba(156, 39, 176, 0.15);
+        }
+
+        h2 {
+            color: #8e24aa;
+            margin-bottom: 15px;
+        }
+
+        .data-item {
+            margin-bottom: 12px;
+            font-size: 1.05em;
+            color: #4a148c;
+        }
+
+        /* NDVI 이미지 전용 스타일 */
+        .ndvi-img {
+            width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+            border-radius: 12px;
+            margin-top: 15px;
+            box-shadow: 0 4px 10px rgba(156, 39, 176, 0.25);
+        }
+
+        .ndvi-note {
+            margin-top: 10px;
+            font-size: 0.95em;
+            color: #6a1b9a;
+            line-height: 1.5;
+        }
+
+
+        <style>
+    /* 기존 스타일 ... */
+
+    .report-card.highlight {
+        border: 2px solid #ce93d8;
+        background: linear-gradient(135deg, #fce4ec 0%, #f3e5f5 100%);
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-size: 0.95em;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .status-good {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    .status-mid {
+        background: #fff8e1;
+        color: #ff8f00;
+    }
+
+    .status-bad {
+        background: #fff3e0;
+        color: #e65100;
+    }
+
+    .status-dead {
+        background: #ffebee;
+        color: #c62828;
+    }
+
+    .status-none {
+        background: #eceff1;
+        color: #546e7a;
+    }
+
+    .sub-text {
+        font-size: 0.95em;
+        color: #5e35b1;
+        margin-top: 4px;
+        line-height: 1.5;
+    }
+</style>
+
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <header>
+        <h1>📊 식물 리포트</h1>
+        <p>최근 센서 데이터와 성장 상태 분석</p>
+    </header>
+
+    <div class="report-card highlight">
+    <h2>오늘 이 식물 한 줄 요약</h2>
+
+    <p class="status-badge status-{{ ndvi_status_code|default:"none" }}">
+        {{ ndvi_status_label|default:"아직 상태를 판단할 수 없어요" }}
+    </p>
+
+    <p class="data-item">
+        {{ ndvi_summary_message|default:"NDVI를 측정하면 이 식물이 얼마나 활기 있는지 한눈에 볼 수 있어요." }}
+    </p>
+
+    <p class="sub-text">
+        {{ ndvi_trend_message|default:"조금 더 데이터를 모으면, 이 식물이 좋아지는 중인지 힘들어하는 중인지 흐름을 알려줄게요." }}
+    </p>
+
+    <p class="sub-text">
+        {{ ndvi_action_message|default:"오늘은 흙 상태와 빛을 한 번 살펴보고, 다음에 측정할 때를 위해 메모를 남겨두면 좋습니다." }}
+    </p>
+</div>
+
+
+    <!-- 기존 생육 데이터 카드 -->
+    <div class="report-card">
+        <h2>🌱 생육 데이터</h2>
+        <p class="data-item">토양 습도: {{ soil_moisture|default:"45%" }}</p>
+        <p class="data-item">조도(Lux): {{ light_lux|default:"320" }}</p>
+        <p class="data-item">온도: {{ temperature|default:"23.5°C" }}</p>
+        <p class="data-item">습도: {{ humidity|default:"58%" }}</p>
+    </div>
+
+    <!-- 기존 물 준 기록 카드 -->
+    <div class="report-card">
+        <h2>💧 물 준 기록</h2>
+        <p class="data-item">최근 물주기: {{ last_watering_time|default:"2025-11-17 10:30" }}</p>
+        <p class="data-item">이번 주 총 급수 횟수: {{ watering_count_week|default:"3회" }}</p>
+    </div>
+
+    <!-- 기존 성장 로그 카드 -->
+    <div class="report-card">
+        <h2>📈 성장 로그</h2>
+        <p class="data-item">{{ growth_log_1|default:"2025-11-01: 새 잎 1개 성장" }}</p>
+        <p class="data-item">{{ growth_log_2|default:"2025-10-27: 잎 색 개선됨" }}</p>
+        <p class="data-item">{{ growth_log_3|default:"2025-10-21: 토양 건조도 감소" }}</p>
+    </div>
+
+    <!-- ✅ NDVI 분석 카드 (ndvi.py 결과 활용) -->
+    <div class="report-card">
+        <h2>🌿 NDVI(식생지수) 분석</h2>
+        <p class="data-item">마지막 측정 시각: {{ ndvi_time|default:"최근 측정 없음" }}</p>
+        <p class="data-item">평균 NDVI: {{ ndvi_avg|default:"0.68" }}</p>
+        <p class="data-item">중앙값 NDVI: {{ ndvi_mid|default:"0.65" }}</p>
+
+        <!-- ndvi.py가 저장한 그래프 이미지 사용 -->
+        <img src="{% static 'image/final_result_graph.png' %}" alt="NDVI 분석 그래프" class="ndvi-img">
+
+        <p class="ndvi-note">
+            NDVI는 식물의 활력을 나타내는 지표로, 일반적으로
+            <b>0.6 이상이면 건강한 상태</b>로 볼 수 있습니다.<br>
+            시간이 지남에 따라 NDVI가 떨어지면 수분 부족, 광량 부족, 병해 등의 가능성을 의심해볼 수 있습니다.
+        </p>
+    </div>
+
+</div>
+</body>
+</html>

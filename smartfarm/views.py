@@ -60,22 +60,104 @@ from django.shortcuts import render
 
 CSV_FILENAME = "ndvi_log.csv"   # ndvi.py와 같은 위치에 있다고 가정
 
+
+
+def analyze_ndvi_rows(rows):
+    """
+    ndvi_log.csv에서 읽어온 rows를 바탕으로
+    상태 라벨, 한 줄 요약, 추세, 오늘 권장 액션을 만들어줌.
+    rows: [['Time', 'Average', 'Median'], ...] 의 header 제외 리스트
+    """
+    if not rows:
+        return {
+            "ndvi_status_label": "데이터 없음",
+            "ndvi_status_code": "none",  # CSS용 코드
+            "ndvi_summary_message": "아직 NDVI를 한 번도 측정하지 않아서 정확한 상태를 알기 어려워요.",
+            "ndvi_trend_message": "오늘 한 번 NDVI를 측정해 두면, 이후 변화를 꾸준히 비교해 볼 수 있어요.",
+            "ndvi_action_message": "지금 키우는 위치(창가, 조명, 온도)를 메모해 두면 다음 측정 때 비교하기 좋습니다.",
+        }
+
+    # 최근 5개만 사용
+    recent_rows = rows[-5:]
+    times = [r[0] for r in recent_rows]
+    avgs = [float(r[1]) for r in recent_rows]
+
+    last_time = times[-1]
+    last_avg = avgs[-1]
+
+    # 간단한 추세: 처음 대비 마지막 차이
+    trend_diff = last_avg - avgs[0]
+    if trend_diff > 0.05:
+        trend_state = "up"
+    elif trend_diff < -0.05:
+        trend_state = "down"
+    else:
+        trend_state = "flat"
+
+    # 상태 구간 (ndvi.py의 dead/bad/mid/good을 리포트용 문장으로 변환)
+    if last_avg < 0.10:
+        status_label = "활력이 거의 없는 상태"
+        status_code = "dead"
+        summary = "잎의 활력이 많이 떨어져 있어요. 지금은 뿌리 상태나 과습·병해를 우선 의심해 보는 게 좋아요."
+    elif last_avg < 0.33:
+        status_label = "조금 지쳐 있는 상태"
+        status_code = "bad"
+        summary = "요즘 잎이 예전만큼 탱탱하지는 않은 편이에요. 물·빛·온도 중에서 무엇이 부족한지 하나씩 점검해 보면 좋겠습니다."
+    elif last_avg < 0.66:
+        status_label = "보통 이상으로 무난한 상태"
+        status_code = "mid"
+        summary = "전반적으로는 무난한 편이에요. 다만 환경이 조금만 바뀌어도 활력이 금방 달라질 수 있어서 관찰이 중요합니다."
+    else:
+        status_label = "건강한 상태"
+        status_code = "good"
+        summary = "잎의 활력이 충분한 편이에요. 지금과 비슷한 패턴으로만 관리해 주면 안정적으로 유지될 가능성이 높아요."
+
+    # 추세 문장
+    if trend_state == "up":
+        trend_msg = "최근 몇 번의 측정에서는 NDVI가 조금씩 올라가고 있어요. 지금처럼 환경을 유지하거나, 식물이 좋아하는 패턴을 기록해 두면 좋아요."
+    elif trend_state == "down":
+        trend_msg = "최근 몇 번의 측정에서는 NDVI가 서서히 내려가는 흐름이에요. 빛이 줄었거나 물 주기 패턴이 바뀌지 않았는지 한 번 돌아보는 게 좋겠습니다."
+    else:
+        trend_msg = "최근 NDVI는 큰 변화 없이 비슷한 수준을 유지하고 있어요. 현재 환경이 식물에게 크게 무리는 주지 않고 있는 것으로 보입니다."
+
+    # 오늘 당장 해볼 수 있는 행동 한 줄
+    if last_avg < 0.33:
+        action_msg = "오늘은 잎 색과 촉감을 한 번 살펴보고, 흙이 너무 축축하지 않은지 확인해 주세요. 물은 '마른 뒤 충분히'를 기준으로 조절하는 게 좋습니다."
+    elif last_avg < 0.66:
+        action_msg = "오늘은 창가에서 받는 실제 빛 시간(직사광/간접광)을 대략 몇 시간 정도인지 체크해 두면, 이후 NDVI 변화와 연결해서 보기 좋습니다."
+    else:
+        action_msg = "지금 패턴이 잘 맞고 있는 상태라서, 물·빛·온도 기록을 간단히 남겨두면 나중에 컨디션이 떨어졌을 때 비교하는 데 큰 도움이 됩니다."
+
+    return {
+        "ndvi_status_label": status_label,
+        "ndvi_status_code": status_code,
+        "ndvi_summary_message": summary,
+        "ndvi_trend_message": trend_msg,
+        "ndvi_action_message": action_msg,
+        "ndvi_last_time": last_time,
+        "ndvi_last_avg": last_avg,
+    }
+
+
 def plant_report(request):
     ndvi_time = None
     ndvi_avg = None
     ndvi_mid = None
+    ndvi_rows = []
 
     if os.path.exists(CSV_FILENAME):
         with open(CSV_FILENAME, "r", encoding="utf-8") as f:
             reader = csv.reader(f)
             header = next(reader, None)  # ['Time', 'Average', 'Median']
-            rows = [row for row in reader if row]
+            ndvi_rows = [row for row in reader if row]
 
-        if rows:
-            last = rows[-1]
+        if ndvi_rows:
+            last = ndvi_rows[-1]
             ndvi_time = last[0]
             ndvi_avg = float(last[1])
             ndvi_mid = float(last[2])
+
+    ndvi_analysis = analyze_ndvi_rows(ndvi_rows)
 
     context = {
         "soil_moisture": "45%",
@@ -88,13 +170,21 @@ def plant_report(request):
         "growth_log_2": "2025-10-27: 잎 색 개선됨",
         "growth_log_3": "2025-10-21: 토양 건조도 감소",
 
-        # NDVI 값
+        # NDVI 원시 값
         "ndvi_time": ndvi_time,
         "ndvi_avg": f"{ndvi_avg:.3f}" if ndvi_avg is not None else None,
         "ndvi_mid": f"{ndvi_mid:.3f}" if ndvi_mid is not None else None,
+
+        # NDVI 해석용 추가 정보
+        "ndvi_status_label": ndvi_analysis["ndvi_status_label"],
+        "ndvi_status_code": ndvi_analysis["ndvi_status_code"],
+        "ndvi_summary_message": ndvi_analysis["ndvi_summary_message"],
+        "ndvi_trend_message": ndvi_analysis["ndvi_trend_message"],
+        "ndvi_action_message": ndvi_analysis["ndvi_action_message"],
     }
 
     return render(request, "plant_report.html", context)
+
 
 
 from django.shortcuts import render, redirect
