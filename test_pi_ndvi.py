@@ -1,19 +1,18 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-from fastiecm import fastiecm
+from fastiecm import fastiecm 
 import time
 import os
 import csv
 from picamera2 import Picamera2 # Picamera2 임포트
 
 # --- 설정 구간 ---
-CAPTURE_INTERVAL = 30
+CAPTURE_INTERVAL = 30  
 CSV_FILENAME = "ndvi_log.csv"
-SAVE_FOLDER = "ndvi_graph"
+SAVE_FOLDER = "ndvi_graph" 
 
 ICON_SIZE = (500, 500)
-CAMERA_RES = (640, 480) # 라즈베리 파이 카메라 해상도 설정
 
 IMG_PATHS = {
     "dead": "plant_death.png",
@@ -46,14 +45,13 @@ if not os.path.exists(CSV_FILENAME):
         writer.writerow(['Time', 'Average', 'Median'])
 
 if not os.path.exists(SAVE_FOLDER):
-    os.makedirs(SAVE_FOLDER)
+    os.makedirs(SAVE_FOLDER) 
 
-# --- Picamera2 설정 ---
+# [수정] cv2.VideoCapture 대신 Picamera2 설정
 picam2 = Picamera2()
-# 미리보기 및 캡처 설정 (RGB888 포맷 사용)
-config = picam2.create_preview_configuration(main={"size": CAMERA_RES, "format": "RGB888"})
+config = picam2.create_preview_configuration(main={"size": (640, 480), "format": "RGB888"})
 picam2.configure(config)
-picam2.start() # 카메라 가동 시작
+picam2.start()
 
 # NDVI 계산 함수들
 def contrast_stretch(im):
@@ -86,12 +84,12 @@ def save_summary_graph_from_csv(csv_path, graph_path, current_timestamp):
                 avgs.append(float(row[1]))
 
         if len(times) > 0:
-            plt.figure(figsize=(10, 6))
+            plt.figure(figsize=(10, 6)) 
             plt.plot(times, avgs, marker='o', color='red', label='Average', linewidth=2)
             plt.title(f"NDVI Trend - {current_timestamp}")
             plt.tight_layout()
             plt.savefig(graph_path)
-            plt.close()
+            plt.close() 
             return True
         else:
             return False
@@ -105,20 +103,14 @@ print("시스템 시작. [창 1: NDVI Camera] [창 2: Plant Status]")
 
 try:
     while True:
-        # Picamera2로 이미지 캡처 (Numpy 배열 반환)
-        # 캡처된 이미지는 RGB 순서입니다.
-        raw_capture = picam2.capture_array()
+        # [수정] Picamera2에서 캡처한 배열을 변환 없이 그대로 original에 저장
+        original = picam2.capture_array()
         
-        # OpenCV는 BGR을 사용하므로 색상 변환 필수
-        original = cv2.cvtColor(raw_capture, cv2.COLOR_RGB2BGR)
-
         # 1. 카메라 영상 처리 (NDVI)
         shape = original.shape
-        # 이미 Picamera 설정에서 해상도를 낮췄으므로 추가 리사이징은 선택사항입니다.
-        # 필요하다면 아래 주석을 해제하세요.
-        # height = int(shape[0] / 2)
-        # width = int(shape[1] / 2)
-        # original = cv2.resize(original, (width, height))
+        height = int(shape[0] / 2)
+        width = int(shape[1] / 2)
+        original = cv2.resize(original, (width, height))
 
         contrasted = contrast_stretch(original)
         ndvi = calc_ndvi(contrasted)
@@ -178,6 +170,7 @@ try:
             break
 
 finally:
-    picam2.stop() # 카메라 정지
-    picam2.close() # 리소스 해제
+    # [수정] 자원 해제
+    picam2.stop()
+    picam2.close()
     cv2.destroyAllWindows()
