@@ -109,7 +109,7 @@ def save_summary_graph_from_csv(csv_path, graph_path, current_timestamp):
         return False
 
 last_capture_time = time.time()
-print("시스템 시작. [창 1: Original] [창 2: NDVI Camera] [창 3: Plant Status]")
+print("시스템 시작. [창 1: NDVI Camera] [창 3: Plant Status]")
 
 try:
     while True:
@@ -170,7 +170,6 @@ try:
             last_capture_time = current_time
 
         # 화면 출력
-        cv2.imshow('Original (Stretched)', stretched_frame)
         cv2.imshow('NDVI Camera', color_mapped_image)  
         cv2.imshow('Plant Status', status_display)      
 
